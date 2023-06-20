@@ -10,7 +10,11 @@ class Post extends Model
     use HasFactory;
 
     protected $table = 'publicaciones';
-    protected $fillable = ['description', 'contenido', 'tematica', 'user_id'];
+    protected $fillable = ['description', 'contenido', 'tematicas', 'user_id']; // Agregar 'tematicas'
+
+    protected $casts = [
+        'tematicas' => 'array', // Castear el campo 'tematicas' como array
+    ];
 
     public function user()
     {

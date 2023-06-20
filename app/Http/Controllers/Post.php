@@ -7,14 +7,16 @@ use App\Http\Requests\PostRequest;
 use App\Http\Resources\PostResource;
 use App\Models\Post;
 
-class PostController extends Controller
-{
-    public function index($topic = null)
+class PostController extends Controller{ 
+    
+    public function index(Request $request)
     {
+        $tematicas = $request->input('tematicas', []); // Obtener las temáticas enviadas en la solicitud
+
         $query = Post::with('comments', 'likes')->latest();
 
-        if ($topic) {
-            $query->where('tematica', $topic);
+        if (!empty($tematicas)) {
+            $query->whereIn('tematicas', $tematicas); // Utilizar whereIn para buscar múltiples temáticas
         }
 
         $posts = $query->paginate(10);
@@ -33,5 +35,6 @@ class PostController extends Controller
         return new PostResource($post);
     }
 }
+
 
 

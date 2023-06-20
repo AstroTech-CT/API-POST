@@ -12,7 +12,7 @@ class CreatePublicacionesTable extends Migration
             $table->id();
             $table->text('description');
             $table->string('contenido')->nullable();
-            $table->string('tematica');
+            $table->json('tematicas'); 
             $table->unsignedBigInteger('user_id');
             $table->timestamps();
 
@@ -25,6 +25,8 @@ class CreatePublicacionesTable extends Migration
         Schema::dropIfExists('publicaciones');
     }
 }
+
+
 
 
 
