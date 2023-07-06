@@ -10,13 +10,17 @@ class CreatePublicacionesTable extends Migration
     {
         Schema::create('publicaciones', function (Blueprint $table) {
             $table->id();
-            $table->text('description');
+            $table->string('description');
             $table->string('contenido')->nullable();
-            $table->json('tematicas'); 
+            $table->json('tematica'); 
+            $table->json('locacion');
             $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('likes_id');
+            $table->unsignedBigInteger('comments_id');
             $table->timestamps();
-
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('likes_id')->references('id')->on('likes');
+            $table->foreign('comments_id')->references('id')->on('comments');
         });
     }
 
@@ -25,8 +29,3 @@ class CreatePublicacionesTable extends Migration
         Schema::dropIfExists('publicaciones');
     }
 }
-
-
-
-
-
