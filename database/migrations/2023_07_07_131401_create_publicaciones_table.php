@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('titulo');
             $table->string('tematica');
             $table->string('locacion');
-            $table->text('contenido');
+            $table->string('contenido'); 
             $table->unsignedBigInteger('user_ci');
             $table->timestamps();
         
