@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('publicaciones', function (Blueprint $table) {
             $table->id();
             $table->string('titulo');
+            $table->string('tematica');
+            $table->string('locacion');
             $table->text('contenido');
             $table->unsignedBigInteger('user_ci');
             $table->timestamps();

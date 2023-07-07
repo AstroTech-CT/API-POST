@@ -10,10 +10,10 @@ class Post extends Model
     use HasFactory;
 
     protected $table = 'publicaciones';
-    protected $fillable = ['description', 'contenido', 'tematicas', 'user_id']; // Agregar 'tematicas'
+    protected $fillable = ['description', 'contenido', 'tematica', 'user_ci']; 
 
     protected $casts = [
-        'tematicas' => 'array', // Castear el campo 'tematicas' como array
+        'tematica' => 'array', 
     ];
 
     public function user()
@@ -26,7 +26,7 @@ class Post extends Model
         return $this->hasMany(Like::class);
     }
 
-    public function comments()
+    public function comentarios()
     {
         return $this->hasMany(Comment::class);
     }
