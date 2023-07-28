@@ -9,16 +9,12 @@ use App\Models\Post;
 
 class PostController extends Controller
 {
-    public function index(Request $request)
+    public function show($topic = null)
     {
-        $tematicaElegida = $request->input('tematica');
+        $query = Post::with('comments', 'likes')->latest();
 
-        $query = Post::with('comentarios', 'likes')->latest();
-
-        if (!empty($tematicaElegida)) {
-            $query->whereHas('tematica', function ($query) use ($tematicaElegida) {
-                $query->where('nombre', $tematicaElegida);
-            });
+        if ($topic) {
+            $query->where('tematica', $topic);
         }
 
         $posts = $query->paginate(10);
@@ -30,13 +26,4 @@ class PostController extends Controller
         $post = auth()->user()->posts()->create($request->validated());
         return new PostResource($post);
     }
-
-    public function show(Post $post)
-    {
-        $post->load('comentarios', 'likes');
-        return new PostResource($post);
-    }
 }
-
-
-
