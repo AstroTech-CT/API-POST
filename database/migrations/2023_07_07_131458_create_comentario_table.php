@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('likes', function (Blueprint $table) {
+        Schema::create('comentario', function (Blueprint $table) {
             $table->id();
+            $table->text('contenido');
             $table->unsignedBigInteger('publicacion_id');
             $table->unsignedBigInteger('user_ci');
             $table->timestamps();
         
-            $table->foreign('publicacion_id')->references('id')->on('publicaciones')->onDelete('cascade');
+            $table->foreign('publicacion_id')->references('id')->on('publicacion')->onDelete('cascade');
             $table->foreign('user_ci')->references('ci')->on('users')->onDelete('cascade');
         });
     }
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('likes');
+        Schema::dropIfExists('comentario');
     }
 };

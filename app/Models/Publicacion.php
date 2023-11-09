@@ -5,30 +5,30 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Post extends Model
+class Publicacion extends Model
 {
     use HasFactory;
 
-    protected $table = 'publicaciones';
+    protected $table = 'publicacion';
     protected $fillable = ['description', 'contenido', 'tematica', 'user_ci']; 
 
     protected $casts = [
         'tematica' => 'array', 
     ];
 
-    public function user()
+    public function users()
     {
         return $this->belongsTo(User::class);
     }
 
-    public function likes()
+    public function Like_Publicacion()
     {
-        return $this->hasMany(Like::class);
+        return $this->hasMany(Like_Publicacion::class);
     }
 
-    public function comentarios()
+    public function Comentario()
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(Comentario::class);
     }
 }
 

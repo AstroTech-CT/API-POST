@@ -1,67 +1,96 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PostRequest;
 use App\Http\Resources\PostResource;
-use App\Models\Post;
+use App\Models\Publicacion;
+use App\Models\Comentario; 
+use App\Models\Like_Publicacion; 
+use App\Models\Reporte_Publicacion; 
+use App\Models\User; 
 
-class PostController extends Controller{
+class PostController extends Controller
+{
+    public function VerPublicaciones($tematica){
 
-    public function VerPublicaciones($tematica)
-    {
-        $posts = Post::where('tematica', $tematica)
-            ->latest()
-            ->take(10)
-            ->get();
-    
-        return response()->json($posts);
+        try {
+            $posts = Publicacion::where('tematica', $tematica)
+                ->latest()
+                ->take(10)
+                ->get();
+
+            return response()->json($posts);
+        } catch (\Exception $e) {
+            
+            return response()->json(['error' => 'Error al traer los post'], 500);
+        }
     }
 
     public function GuardarPublicacion(PostRequest $request){
 
-        $publicaciones = auth()->user()->publicaciones()->create($request->validated());
-        return new PostResource($publicaciones);
-    }
-
-    public function Hacercomentario($id){
-
-        $validatedData = $request->validate([
-            'contenido' => 'required|string|max:255', ]);
-
-        $comentario = new Comentario(); 
-        $comentario->user_ci = auth()->id();
-        $comentario->publicaciones_id = $id; 
-        $comentario->contenido = $validatedData['contenido']; 
-        $comentario->save();
-
-        return response()->json(['message' => 'Comentario creado con éxito'], 201);
-    }
-
-    public function Hacerlike($id) {
-
-        $publicaciones = Post::find($id);
-
-        if (!$publicaciones) {
-            return response()->json(['message' => 'Publicación no encontrada'], 404);
+        try {
+            $publicaciones = auth()->user()->publicacion()->create($request->validated());
+            return new PostResource($publicaciones);
+        } catch (\Exception $e) {
+           
+            return response()->json(['error' => 'Error guardando la publicacion'], 500);
         }
-
-        auth()->user()->likes()->toggle($publicaciones);
-        return response()->json(['message' => 'Like actualizado con éxito'], 200);
     }
 
     public function eliminarPublicacion($id){
 
-        $post = Post::find($id);
+        try {
+            $post = Publicacion::find($id);
 
-        if (!$post) {
-            return response()->json(['message' => 'Publicación no encontrada'], 404);
+            if (!$post) {
+                return response()->json(['message' => 'Publicación no encontrada'], 404);
+            }
+
+            $post->delete();
+
+            return response()->json(['message' => 'Publicación eliminada con éxito'], 200);
+        } catch (\Exception $e) {
+           
+            return response()->json(['error' => 'Error al borrar publicacion'], 500);
         }
-
-        $post->delete();
-
-        return response()->json(['message' => 'Publicación eliminada con éxito'], 200);
     }
-}
 
+   
+    public function hacerLikeYComentario(Request $request, $postId){
+        try {
+            DB::raw('LOCK TABLE like_Publicacion WRITE');
+            DB::raw('LOCK TABLE comentario WRITE');
+            DB::beginTransaction();
+    
+            $usuarioId = $request->user()->ci; 
+    
+            $like = new LikePublicacion();
+            $like->usuario_id = $usuarioId;
+            $like->id_pubicacion = $postId;
+            $like->save();
+    
+            $comentario = new Comentario();
+            $comentario->usuario_id = $usuarioId;
+            $comentario->id_pubicacion = $postId;
+            $comentario->contenido = $request->input('contenido');
+            $comentario->save();
+    
+           
+            DB::statement('UNLOCK TABLES');
+    
+            DB::commit();
+    
+            return response()->json(['mensaje' => 'Like y comentario realizados con éxito'], 200);
+        } catch (\Exception $e) {
+            DB::rollback();
+    
+            return response()->json(['mensaje' => 'Error al realizar like y/o comentario'], 500);
+        }
+    }
+    
+    
+    
+
+}
